@@ -1,0 +1,16 @@
+RESULTS
+
+Match resolution with oriented bounding box
+density scan  0.8983020309821557
+density model 0.814132589652411
+DIF: 0,0842‬
+
+Match resolution with minimum bounding box
+density scan  0,8983020309821536
+density model 1,2355402275607137
+DIF: 0,3372‬
+
+Match resolution based on voxel size
+density scan  0.8983020309821557
+density model 0.6848012102982317
+DIF: 0,2135‬
