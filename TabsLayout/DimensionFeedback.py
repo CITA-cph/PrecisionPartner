@@ -1,4 +1,3 @@
-import json
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -6,14 +5,11 @@ import dash_daq as daq
 import numpy as np
 import open3d as o3d
 import plotly.graph_objects as go
-import plotly.express as px
 from dash.dependencies import Input, Output, State
-import vector3d
 import math
 from scipy.cluster.vq import kmeans
 import base64
 import os
-import datetime
 import dash_bootstrap_components as dbc
 import copy
 
@@ -707,8 +703,6 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         children = [parse_contents(c, n, d) for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)]
         return children
-
-
 
 #These two change the dim tolerance gradient annotation
 @app.callback(Output('neg', 'children'),
