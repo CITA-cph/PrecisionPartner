@@ -17,17 +17,6 @@ import datetime
 import dash_bootstrap_components as dbc
 import copy
 
-#notes
-# move global variables at the start of the code
-# start tabs with button yes and no
-# icp in line 120, turn it off for faster debugging
-# currently loading the model twice line 71 and 503
-# declare filenames at the start of the code
-# LINE 526 readyTab3 and 4 - the two variables can be one
-# 01/05 changes create_cloud added color var
-# line 556 match centers, case balcony more scan data than model, doesnt help
-
-
 #VARIABLES_____________________________________________________________________________________________
 #Dash related
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -1012,12 +1001,12 @@ def rotate(ICP, slider_z, slider_y, slider_x, fig, cur_id): # all the inputs fro
         # a transformation matrix with rotation = 0, translation = 0 and scale = 1
         trans_init = [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0],[0.0, 0.0, 0.0, 1.0]]
         # compute transformation from ICP
-        #reg_p2p = o3d.registration.registration_icp(
-        #    scan_pcd, pcd, threshold, trans_init,
-        #    o3d.registration.TransformationEstimationPointToPoint())
+        reg_p2p = o3d.registration.registration_icp(
+            scan_pcd, pcd, threshold, trans_init,
+            o3d.registration.TransformationEstimationPointToPoint())
 
         # apply transformation to scan
-        #scan_pcd.transform(reg_p2p.transformation)
+        scan_pcd.transform(reg_p2p.transformation)
 
         fig.data = []
         # adds the trace of the scan and the model (both pcls)
