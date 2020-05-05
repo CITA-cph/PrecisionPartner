@@ -12,6 +12,8 @@ import base64
 import os
 import dash_bootstrap_components as dbc
 import copy
+from dash.exceptions import PreventUpdate
+
 
 #VARIABLES_____________________________________________________________________________________________
 #Dash related
@@ -50,6 +52,9 @@ rot_val = []
 #image display
 logos_filename = os.path.join(os.getcwd(), 'logos2.png')
 encoded_logos = base64.b64encode(open(logos_filename, 'rb').read())
+
+global tabHist
+tabHist = []
 
 def loadCloud(path, color):
     # Cloud path, color for display, bool to make kd tree
@@ -464,32 +469,63 @@ app.layout = html.Div([
             dcc.Tab(label='3. Feedback', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-3'),
             dcc.Tab(label='4. Manual dimensions', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-4')
     ]),
-    html.Div([html.P("Are the two point clouds aligned?"),
-              dbc.Button('NO', id='button-not'),
-              dbc.Button('YES', id='button-yes')
-              ], style=dict(display='none')),
+
+    html.Div([html.P("Are the two point clouds aligned?", style=dict(display='none')),
+              dbc.Button('NO', id='button-not', style=dict(display='none')),
+              dbc.Button('YES', id='button-yes', style=dict(display='none'))],style=dict(display='none')),
+
     html.Div([dcc.Loading(id='tabs-example-content')]), # DIF
+
     html.Div([
                 html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()), style={'height':'50%','width':'99%'})]),
-    ])
+    ]),
+
+
 ])
 
 #Change Tabs
 @app.callback(Output('tabs-example-content', 'children'),
               [Input('tabs-example', 'value')])
+
 def render_content(tab):
-    if tab == 'tab-1':
+
+    #Tab1 first time
+    if tab == 'tab-1' and not tabHist:
+        print(" :: we are in tab1 for the first time")
+
+
+        tabHist.append(tab)
+        print("tabHist", tabHist)
+
         return html.Div([
                         html.Div([dcc.Upload(id='upload-data', children=html.Div([html.Button('Upload Files')]),
                                              style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 'auto', 'margin': '10px', 'display': 'inline-block'}, multiple=True)]),
-                        html.Div(id='upload-output'),
-                        html.Div([html.P("Are the two point clouds aligned?",
+                        html.Div(id='upload-output'), #computing run
+
+                html.Div([html.P("Are the two point clouds aligned?",
                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin':'5px','height': 'auto', 'display': 'inline'}),
                                   dbc.Button('NO', id='button-not',  color="secondary", className="mr-1", style={'fontFamily': 'dosis', 'fontSize': '15px', 'width':'40px', 'height': '30px', 'margin': '3px'}),
                                   dbc.Button('YES', id='button-yes',  color="secondary", className="mr-1", style={'fontFamily': 'dosis', 'fontSize': '15px', 'width':'40px', 'height': '30px', 'margin': '3px'})
                                   ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
         ])
+
+    elif tab == 'tab-1' and len(tabHist) > 1:
+        # tabHist[-1] != tab
+        print("if we are in tab1 second time")
+
+        tabHist.append(tab)
+        print("tabHist", tabHist)
+
+        return html.Div([
+                        html.Div(id='reloaded-tab1') #loading
+        ])
+
+
+
     elif tab == 'tab-2':
+        tabHist.append(tab)
+        print("tabHist", tabHist)
+
         if readyTab3 == True:
             global fig
             fig = create_cloud(pcd, downSize, 'grey')
@@ -547,8 +583,8 @@ def render_content(tab):
                 mesh = o3d.io.read_triangle_mesh(pathMesh)
 
                 # load standard dimension cloud
-                pathDimCloud1 = p + '/cloud1.xyz'  # start
-                pathDimCloud2 = p + '/cloud2.xyz'  # end
+                pathDimCloud1 = p + '/amager_cloud1.xyz'  # start
+                pathDimCloud2 = p + '/amager_cloud2.xyz'  # end
                 d1pcd = loadCloud(pathDimCloud1, red)
                 d2pcd = loadCloud(pathDimCloud2, red)
 
@@ -613,6 +649,7 @@ def render_content(tab):
                 return html.Div([
                     html.H3('Please follow the steps')
                 ])
+
     elif tab == 'tab-4':
             if readyTab4 == True:
 
@@ -709,8 +746,13 @@ def parse_contents(contents, filename, date):
               [State('upload-data', 'filename'),
                State('upload-data', 'last_modified')])
 def update_output(list_of_contents, list_of_names, list_of_dates):
-    if list_of_contents is not None:
+    if list_of_contents is not None and len(tabHist) == 1:
         children = [parse_contents(c, n, d) for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)]
+
+        global saveTab1
+        saveTab1 = children
+        print("figure saved")
+
         return children
 
 #These two change the dim tolerance gradient annotation
@@ -727,7 +769,6 @@ def update_pos(value):
 #This changes mesh tolerance annotation
 @app.callback(Output('3d_mesh', 'figure'),
             [Input('toleranceSelect', 'value')])
-
 def changeMeshPlot(toleranceSelect):
     return redrawMeshDim(toleranceSelect,m,cldStartPtArray,cldEndPtArray,mtraces_nodim)
 
@@ -755,7 +796,6 @@ def redrawMeshDim(toleranceSelect, m, cldStartPtArray, cldPEndPtArray, mtraces_n
             [Input('subValue', 'value'),
              Input('3d_scan', 'clickData'),
              Input('erase', 'n_clicks')])
-
 def changeCloudPlot(subValue,clickData, n_clicks):
     return redrawCloud(subValue,clickData, n_clicks,c ,cloud_traces, resultsX,resultsY,resultsZ)
 
@@ -866,8 +906,7 @@ def redrawCloud(subValue,clickData, n_clicks, c,cloud_traces, resultsX,resultsY,
         else:
             return c
 
-
-
+#This rotates the cloud in tab2
 @app.callback(Output('3d_scat', 'figure'),
             [Input('ICP', 'n_clicks'),
             Input('slider_z', 'value'),
@@ -1019,7 +1058,7 @@ def rotate(ICP, slider_z, slider_y, slider_x, fig, cur_id): # all the inputs fro
     else:
         return fig
 
-
+#Creates Modal
 @app.callback(
     Output("modal", "is_open"),
     [Input("open", "n_clicks"), Input("close", "n_clicks")],
@@ -1048,6 +1087,16 @@ def change_tab(clicks1, clicks2):
         elif button_id == "button-yes":
             return "tab-3"
     return "tab-1"
+
+
+@app.callback(Output('reloaded-tab1', 'children'),
+            [Input('tabs-example', 'value')])
+def redrawGraph(tab):
+    if len(tabHist) > 1 and tab == 'tab-1':
+        print("loading saved graph")
+        return saveTab1
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
