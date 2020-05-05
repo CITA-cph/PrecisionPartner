@@ -1,4 +1,3 @@
-import json
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -6,14 +5,11 @@ import dash_daq as daq
 import numpy as np
 import open3d as o3d
 import plotly.graph_objects as go
-import plotly.express as px
 from dash.dependencies import Input, Output, State
-import vector3d
 import math
 from scipy.cluster.vq import kmeans
 import base64
 import os
-import datetime
 import dash_bootstrap_components as dbc
 import copy
 
@@ -55,7 +51,6 @@ rot_val = []
 logos_filename = os.path.join(os.getcwd(), 'logos2.png')
 encoded_logos = base64.b64encode(open(logos_filename, 'rb').read())
 
-#Iliana
 def loadCloud(path, color):
     # Cloud path, color for display, bool to make kd tree
 
@@ -179,7 +174,6 @@ def transf_from_rotation(dx, dy, dz):
     trans_matrix[0:3, 0:3] = rot_matrix
     return trans_matrix
 
-#Gabriella
 #CloudViz
 def create_cloud(cloud, downsample, color):
     #cloud that has already been loaded and lives in the directory
@@ -470,12 +464,15 @@ app.layout = html.Div([
             dcc.Tab(label='3. Feedback', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-3'),
             dcc.Tab(label='4. Manual dimensions', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-4')
     ]),
-    html.Div([html.P("Are the two point clouds aligned?", style={'height': 'auto', 'display': 'inline'}),
-              html.Button('NO', id='button-not', style={'height': 'auto'}),
-              html.Button('YES', id='button-yes', style={'height': 'auto'})
+    html.Div([html.P("Are the two point clouds aligned?"),
+              dbc.Button('NO', id='button-not'),
+              dbc.Button('YES', id='button-yes')
               ], style=dict(display='none')),
-    html.Div([dcc.Loading(id='tabs-example-content')]) # DIF
-])])
+    html.Div([dcc.Loading(id='tabs-example-content')]), # DIF
+    html.Div([
+                html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()), style={'height':'50%','width':'99%'})]),
+    ])
+])
 
 #Change Tabs
 @app.callback(Output('tabs-example-content', 'children'),
@@ -483,12 +480,14 @@ app.layout = html.Div([
 def render_content(tab):
     if tab == 'tab-1':
         return html.Div([
-                        html.Div([dcc.Upload(id='upload-data', children=html.Div([html.A('Upload Files')]), style={'height': 'auto', 'margin': '10px', 'display': 'inline-block'}, multiple=True)]),
+                        html.Div([dcc.Upload(id='upload-data', children=html.Div([html.Button('Upload Files')]),
+                                             style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 'auto', 'margin': '10px', 'display': 'inline-block'}, multiple=True)]),
                         html.Div(id='upload-output'),
-                        html.Div([html.P("Are the two point clouds aligned?", style={'height': 'auto', 'display': 'inline'}),
-                                  html.Button('NO', id='button-not', style={'height': 'auto'}),
-                                  html.Button('YES', id='button-yes', style={'height': 'auto'})
-                                  ], style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')),
+                        html.Div([html.P("Are the two point clouds aligned?",
+                                         style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin':'5px','height': 'auto', 'display': 'inline'}),
+                                  dbc.Button('NO', id='button-not',  color="secondary", className="mr-1", style={'fontFamily': 'dosis', 'fontSize': '15px', 'width':'40px', 'height': '30px', 'margin': '3px'}),
+                                  dbc.Button('YES', id='button-yes',  color="secondary", className="mr-1", style={'fontFamily': 'dosis', 'fontSize': '15px', 'width':'40px', 'height': '30px', 'margin': '3px'})
+                                  ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
         ])
     elif tab == 'tab-2':
         if readyTab3 == True:
@@ -498,14 +497,9 @@ def render_content(tab):
             fig.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                               scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                          yaxis=dict(title='', showbackground=False, showticklabels=False),
-                                         zaxis=dict(title='', showbackground=False, showticklabels=False)), width=1000,
-                              height=500, margin=dict(r=0, l=0, b=10, t=10)),
+                                         zaxis=dict(title='', showbackground=False, showticklabels=False)), ),
             print("tab 2 is made")
             return html.Div([
-                html.Div([
-                    html.Div([html.Button('Finish and proceed to 3.Feedback', id='ICP',
-                                          style={'height': 'auto', 'margin': '3px'})]),
-                ]),
                 html.Div([
                     html.Div([daq.Slider(id='slider_z', marks={'180': 'Rotation on Z axis'}, min=1, max=360, step=1,
                                          value=180, size=400)]),
@@ -513,12 +507,26 @@ def render_content(tab):
                                          value=180, size=400)]),
                     html.Div([daq.Slider(id='slider_x', marks={'180': 'Rotation on X axis'}, min=1, max=360, step=1,
                                          value=180, size=400)]),
-                ], style={'width': '2000', 'display': 'flex', 'flexWrap': 'nowrap', 'align-items': 'center',
-                          'justify-content': 'center'}),
+                ], style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '100%', 'display': 'flex', 'flexWrap': 'nowrap', 'align-items': 'center',
+                          'justify-content': 'center', 'margin':'10px'}),
                 html.Div([
-                    html.Div(dcc.Graph(id='3d_scat', figure=fig), style={'height': 'auto', 'margin': '20px'}),
-                ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', width='99%',
-                              horizontalAlignment='middle'))
+                    html.Div(dcc.Graph(id='3d_scat', figure=fig), style={'height': '50%', 'margin': '20px', 'width':'99%'}),
+                ], style=dict(uirevision=True, horizontalAlignment='middle')),
+                html.Div([
+                    html.Div([dbc.Button('Finish', id='ICP', color="secondary", className="mr-1",
+                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'})]),
+                    html.Div(
+                        [
+                            dbc.Button("Proceed to Feedback", id="open",
+                                       style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'}),
+                            dbc.Modal(
+                                [
+                                    dbc.ModalHeader("Proceed to Feedback"),
+                                    dbc.ModalBody("The two models are aligned and you can proceed to tab 3.Feedback"),
+                                    dbc.ModalFooter(
+                                        dbc.Button("Close", id="close", className="mr-1")
+                                    ), ], id="modal", ), ])
+                ], style={'display': 'flex', 'flexWrap': 'nowrap', 'verticalAlignment':'middle'}),
             ])
         else:
             return html.Div([
@@ -569,37 +577,37 @@ def render_content(tab):
                 m.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                                 scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                            yaxis=dict(title='', showbackground=False, showticklabels=False),
-                                           zaxis=dict(title='', showbackground=False, showticklabels=False)), width=800,
-                                height=450,
-                                margin=dict(r=0, l=0, b=10, t=10)),
+                                           zaxis=dict(title='', showbackground=False, showticklabels=False))),
 
-                return html.Div([html.P("Select tolerance: ",
-                                        style={'height': 'auto', 'display': 'inline', 'fontFamily': 'calibri'}),
-                                 html.Div([dcc.Dropdown(id='toleranceSelect',
-                                                        options=[{'label': '+/- 2mm', 'value': '2'},
-                                                                 {'label': '+/- 3mm', 'value': '3'},
-                                                                 {'label': '+/- 5mm', 'value': '5'},
-                                                                 {'label': '+/- 10mm', 'value': '10'}], value='2',
-                                                        style={'width': 200, 'height': 'auto', 'margin': '3px'})])
-                                 ],
-                                style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
-                       html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()))],
-                                style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
-                       html.Div([
-                           html.Div(id='empty', style={'width': 155, 'height': 'auto', 'display': 'inline'}),
-                           html.Div(id='neg', style={'width': 170, 'height': 'auto', 'display': 'inline',
-                                                     'fontFamily': 'calibri'}),
-                           html.Div(id='pos', style={'height': 'auto', 'display': 'inline', 'fontFamily': 'calibri'})],
-                           style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
-                       html.Div([
-                           html.Div(id='empty2', style={'width': 20, 'height': 'auto', 'display': 'inline'}),
-                           html.P("3d Model ", style={'height': 'auto', 'display': 'inline', 'fontFamily': 'dosis',
-                                                      'fontSize': '20px'})],
-                           style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
-                       html.Div([
-                           html.Div(dcc.Graph(id='3d_mesh', figure=m), style={'height': '2000'}),
-                       ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', width='99%',
-                                     horizontalAlignment='middle'))
+                return html.Div([
+                            html.Div([html.P("Select tolerance: ",
+                                                style={'fontFamily': 'dosis', 'fontSize': '15px', 'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 10,'height': 'auto', 'display': 'inline'}),
+                                         html.Div([dcc.Dropdown(id='toleranceSelect',
+                                                                options=[{'label': '+/- 2mm', 'value': '2'},
+                                                                         {'label': '+/- 3mm', 'value': '3'},
+                                                                         {'label': '+/- 5mm', 'value': '5'},
+                                                                         {'label': '+/- 10mm', 'value': '10'}], value='2',
+                                                                style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': 150, 'height': 30, 'marginLeft': 0, 'marginRight': 10, 'marginTop': 10, 'marginBottom': 10}),
+
+                                                   ]),
+                                          html.Div([html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()), style={'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 3})]),
+                                         ],
+                                        style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')),
+                           html.Div([
+                               html.Div(id='empty', style={'width': 155, 'height': 'auto', 'display': 'inline'}),
+                               html.Div(id='neg', style={'width': 170, 'height': 'auto', 'display': 'inline',
+                                                         'fontFamily': 'dosis', 'fontSize': '15px'}),
+                               html.Div(id='pos', style={'height': 'auto', 'display': 'inline', 'fontFamily': 'dosis', 'fontSize': '15px'})],
+                               style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle', marginLeft=290)),
+                           html.Div([
+                               html.Div(id='empty2', style={'width': 20, 'height': 'auto', 'display': 'inline'}),
+                               html.P("3d Model ", style={'height': 'auto', 'display': 'inline', 'fontFamily': 'dosis',
+                                                          'fontSize': '20px'})],
+                               style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')),
+                           html.Div([
+                               html.Div(dcc.Graph(id='3d_mesh', figure=m), style={'height': '70%', 'margin': '5px', 'width':'99%'}),
+                           ], style=dict(uirevision=True, horizontalAlignment='middle'))
+                    ])
 
             else:
                 return html.Div([
@@ -632,31 +640,29 @@ def render_content(tab):
                 c.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                                 scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                            yaxis=dict(title='', showbackground=False, showticklabels=False),
-                                           zaxis=dict(title='', showbackground=False, showticklabels=False)), width=800,
-                                height=450,
-                                margin=dict(r=0, l=0, b=10, t=10)),
+                                           zaxis=dict(title='', showbackground=False, showticklabels=False))),
 
                 print("complete")
                 print(c.layout)
 
                 return html.Div([
                     html.P("Cloud Voxel Downsampling:",
-                           style={'height': 'auto', 'display': 'inline', 'fontFamily': 'calibri'}),
+                           style={'fontFamily': 'dosis', 'fontSize': '15px', 'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 10,'height': 'auto', 'display': 'inline'}),
                     html.Div([dcc.Input(id='subValue', value='20', type='number',
-                                        style={'height': 'auto', 'margin': '3px', 'verticalAlignment': 'middle'})]),
-                    html.Div([html.Button('Erase Trace', id='erase',
-                                          style={'height': 'auto', 'margin': '3px', 'fontFamily': 'calibri'})])
+                                        style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': 100, 'height': 30, 'marginLeft': 0, 'marginRight': 10, 'marginTop': 10, 'marginBottom': 10})]),
+                    html.Div([dbc.Button('Erase Trace', id='erase', color="secondary", className="mr-1",
+                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 30, 'margin': 10})])
                 ], style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
                        html.Div([
                            html.Div(id='empty3', style={'width': 20, 'height': 'auto', 'display': 'inline'}),
                            html.P("3d Scan ", style={'height': 'auto', 'display': 'inline', 'fontFamily': 'dosis',
-                                                     'fontSize': '20px'})],
+                                                          'fontSize': '20px'})],
                            style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
                        html.Div([
-                           html.Div(dcc.Graph(id='3d_scan', figure=c), style={'height': '2000'}),
-                       ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', width='99%',
-                                     horizontalAlignment='middle'))
-
+                           html.Div(dcc.Graph(id='3d_scan', figure=c), style={'height': '70%', 'margin': '5px', 'width':'99%'}),
+                       ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', horizontalAlignment='middle'))
+#html.Div([dbc.Button('Finish', id='ICP', color="secondary", className="mr-1",
+#                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'})]),
             else:
                 return html.Div([
                     html.H3('Please follow the steps')
@@ -684,8 +690,7 @@ def parse_contents(contents, filename, date):
     c.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                     scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                yaxis=dict(title='', showbackground=False, showticklabels=False),
-                               zaxis=dict(title='', showbackground=False, showticklabels=False)), width=800,
-                    height=450, margin=dict(r=0, l=0, b=10, t=10)),
+                               zaxis=dict(title='', showbackground=False, showticklabels=False))),
 
     # run icp and add the scan as a trace
     #scan_pcd = ransac_icp(scan_pcd, pcd)
@@ -695,7 +700,7 @@ def parse_contents(contents, filename, date):
     readyTab3 = True
     readyTab4 = True
 
-    return html.Div(dcc.Graph(id='DemoView', figure= c), style={'height': 'auto'})
+    return html.Div(dcc.Graph(id='DemoView', figure= c), style={'height': '70%', 'width':'99%'})
 
 
 #Runs Ransac ICP when the file is uploaded
@@ -707,8 +712,6 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         children = [parse_contents(c, n, d) for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)]
         return children
-
-
 
 #These two change the dim tolerance gradient annotation
 @app.callback(Output('neg', 'children'),
@@ -1016,6 +1019,16 @@ def rotate(ICP, slider_z, slider_y, slider_x, fig, cur_id): # all the inputs fro
     else:
         return fig
 
+
+@app.callback(
+    Output("modal", "is_open"),
+    [Input("open", "n_clicks"), Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 #callback to change the tab with a button
 @app.callback(
