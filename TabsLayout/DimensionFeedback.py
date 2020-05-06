@@ -458,29 +458,24 @@ def create_CallbackdimText(array1, array2):
 print("initializing UI")
 
 app.layout = html.Div([
-    html.Div([
-            html.P("Precision Partner_Dimension Feedback", style={ 'fontFamily':'dosis','fontSize':'30px'})]),
+        html.Div([
+                html.P("Precision Partner_Dimension Feedback", style={ 'fontFamily':'dosis','fontSize':'30px'})]),
 
-    html.Div([
-        dcc.Tabs(id='tabs-example', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-1', children=[
-            dcc.Tab(label='1. Upload and automatic alignment', style={'fontFamily': 'dosis', 'fontSize': '15px'},
-                    value='tab-1'),
-            dcc.Tab(label='2. Manual alignment', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-2'),
-            dcc.Tab(label='3. Feedback', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-3'),
-            dcc.Tab(label='4. Manual dimensions', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-4')
-    ]),
+        html.Div([
+            dcc.Tabs(id='tabs-example', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-1', children=[
+                dcc.Tab(label='1. Upload and automatic alignment', style={'fontFamily': 'dosis', 'fontSize': '15px'},
+                        value='tab-1'),
+                dcc.Tab(label='2. Manual alignment', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-2'),
+                dcc.Tab(label='3. Feedback', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-3'),
+                dcc.Tab(label='4. Manual dimensions', style={'fontFamily': 'dosis', 'fontSize': '15px'}, value='tab-4')
+        ]),
 
-    html.Div([html.P("Are the two point clouds aligned?", style=dict(display='none')),
-              dbc.Button('NO', id='button-not', style=dict(display='none')),
-              dbc.Button('YES', id='button-yes', style=dict(display='none'))],style=dict(display='none')),
+        html.Div([html.P("Are the two point clouds aligned?", style=dict(display='none')),
+                  dbc.Button('NO', id='button-not', style=dict(display='none')),
+                  dbc.Button('YES', id='button-yes', style=dict(display='none'))],style=dict(display='none')),
 
-    html.Div([dcc.Loading(id='tabs-example-content')]), # DIF
-
-    html.Div([
-                html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()), style={'height':'50%','width':'99%'})]),
-    ]),
-
-
+        html.Div([dcc.Loading(id='tabs-example-content')]), # DIF
+    ])
 ])
 
 #Change Tabs
@@ -498,15 +493,24 @@ def render_content(tab):
         print("tabHist", tabHist)
 
         return html.Div([
-                        html.Div([dcc.Upload(id='upload-data', children=html.Div([html.Button('Upload Files')]),
-                                             style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 'auto', 'margin': '10px', 'display': 'inline-block'}, multiple=True)]),
-                        html.Div(id='upload-output'), #computing run
+                html.Div([dcc.Upload(id='upload-data', children=html.Div([html.Button('Upload Files')]),
+                                     style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 'auto', 'margin': '10px', 'display': 'inline-block'}, multiple=True)]),
+                html.Div(id='upload-output'), #computing run
 
                 html.Div([html.P("Are the two point clouds aligned?",
-                                         style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin':'5px','height': 'auto', 'display': 'inline'}),
-                                  dbc.Button('NO', id='button-not',  color="secondary", className="mr-1", style={'fontFamily': 'dosis', 'fontSize': '15px', 'width':'40px', 'height': '30px', 'margin': '3px'}),
-                                  dbc.Button('YES', id='button-yes',  color="secondary", className="mr-1", style={'fontFamily': 'dosis', 'fontSize': '15px', 'width':'40px', 'height': '30px', 'margin': '3px'})
-                                  ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
+                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin': '5px', 'height': 'auto',
+                                        'display': 'inline'}),
+                          dbc.Button('NO', id='button-not', color="secondary", className="mr-1",
+                                     style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '40px', 'height': '30px',
+                                            'margin': '3px'}),
+                          dbc.Button('YES', id='button-yes', color="secondary", className="mr-1",
+                                     style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '40px', 'height': '30px',
+                                            'margin': '3px'})
+                          ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
+                html.Div(id='emptyBig'),
+                html.Div([
+                    html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
+                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
         ])
 
     elif tab == 'tab-1' and len(tabHist) > 1:
@@ -520,8 +524,6 @@ def render_content(tab):
         print("tabHist", tabHist)
 
         return html.Div([html.Div(id='reloaded-tab1')])
-
-
 
     elif tab == 'tab-2':
         if readyTab3 == True and tab not in tabHist:
@@ -566,6 +568,9 @@ def render_content(tab):
                                         dbc.Button("Close", id="close", className="mr-1")
                                     ), ], id="modal", ), ])
                 ], style={'display': 'flex', 'flexWrap': 'nowrap', 'verticalAlignment':'middle'}),
+                html.Div([
+                    html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
+                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
             ])
 
             tabHist.append(tab)
@@ -662,7 +667,10 @@ def render_content(tab):
                                style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')),
                            html.Div([
                                html.Div(dcc.Graph(id='3d_mesh', figure=m), style={'height': '70%', 'margin': '5px', 'width':'99%'}),
-                           ], style=dict(uirevision=True, horizontalAlignment='middle'))
+                           ], style=dict(uirevision=True, horizontalAlignment='middle')),
+                    html.Div([
+                        html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
+                                 style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
                     ])
 
                 tabHist.append(tab)
@@ -730,9 +738,11 @@ def render_content(tab):
                            style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
                        html.Div([
                            html.Div(dcc.Graph(id='3d_scan', figure=c), style={'height': '70%', 'margin': '5px', 'width':'99%'}),
-                       ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', horizontalAlignment='middle'))
-#html.Div([dbc.Button('Finish', id='ICP', color="secondary", className="mr-1",
-#                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'})]),
+                       ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', horizontalAlignment='middle')),
+                html.Div([
+                    html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
+                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
+
 
                 tabHist.append(tab)
                 print("tabHist", tabHist)
@@ -801,6 +811,16 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
         print("figure saved")
 
         return children
+
+# delete the empty div from tab1
+@app.callback(Output('emptyBig', 'style'),
+              [Input('upload-data', 'contents')])
+def hide_emptyBig(contents):
+    if not contents:
+        return {'width':'auto','height': 400}
+    else:
+        print("hide")
+        return {'display':'none'}
 
 #These two change the dim tolerance gradient annotation
 @app.callback(Output('neg', 'children'),
