@@ -491,7 +491,7 @@ def render_content(tab):
 
     #Tab1 first time
     if tab == 'tab-1' and not tabHist:
-        print(" :: we are in tab1 for the first time")
+        print(">>we are computing tab1 first time")
 
 
         tabHist.append(tab)
@@ -510,24 +510,24 @@ def render_content(tab):
         ])
 
     elif tab == 'tab-1' and len(tabHist) > 1:
-        # tabHist[-1] != tab
-        print("if we are in tab1 second time")
+        print(">>we are loading tab1 again")
+
+
+
+        print("tab1 from saved")
 
         tabHist.append(tab)
         print("tabHist", tabHist)
 
-        return html.Div([
-                        html.Div(id='reloaded-tab1') #loading
-        ])
+        return html.Div([html.Div(id='reloaded-tab1')])
 
 
 
     elif tab == 'tab-2':
-        tabHist.append(tab)
-        print("tabHist", tabHist)
+        if readyTab3 == True and tab not in tabHist:
+            print(">>we are computing tab2 first time")
 
-        if readyTab3 == True:
-            global fig
+            global fig, saveTab2
             fig = create_cloud(pcd, downSize, 'grey')
             fig.add_trace(create_cloud_trace(scan_pcd, downSize, 'red'))
             fig.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
@@ -535,7 +535,10 @@ def render_content(tab):
                                          yaxis=dict(title='', showbackground=False, showticklabels=False),
                                          zaxis=dict(title='', showbackground=False, showticklabels=False)), ),
             print("tab 2 is made")
-            return html.Div([
+
+
+
+            saveTab2 =  html.Div([
                 html.Div([
                     html.Div([daq.Slider(id='slider_z', marks={'180': 'Rotation on Z axis'}, min=1, max=360, step=1,
                                          value=180, size=400)]),
@@ -564,15 +567,32 @@ def render_content(tab):
                                     ), ], id="modal", ), ])
                 ], style={'display': 'flex', 'flexWrap': 'nowrap', 'verticalAlignment':'middle'}),
             ])
+
+            tabHist.append(tab)
+            print("tabHist", tabHist)
+
+            return saveTab2
+
+        elif tab == 'tab-2' and tab in tabHist:
+            print(">>we are loading tab2 second time")
+            print("tab 2 from saved")
+
+            tabHist.append(tab)
+            print("tabHist", tabHist)
+
+            return saveTab2
+
+
         else:
             return html.Div([
                     html.H3('Please follow the steps')
                 ])
 
     elif tab == 'tab-3':
-            if readyTab3 == True:
+            if readyTab3 == True and tab not in tabHist:
+                print(">>we are computing tab3 first time")
                 # variables needed
-                global m, cldStartPtArray, cldEndPtArray, mtraces_nodim
+                global m, cldStartPtArray, cldEndPtArray, mtraces_nodim, saveTab3
 
                 # load gradient image
                 image_filename = p + '/gradient.png'
@@ -615,7 +635,7 @@ def render_content(tab):
                                            yaxis=dict(title='', showbackground=False, showticklabels=False),
                                            zaxis=dict(title='', showbackground=False, showticklabels=False))),
 
-                return html.Div([
+                saveTab3 = html.Div([
                             html.Div([html.P("Select tolerance: ",
                                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 10,'height': 'auto', 'display': 'inline'}),
                                          html.Div([dcc.Dropdown(id='toleranceSelect',
@@ -645,16 +665,29 @@ def render_content(tab):
                            ], style=dict(uirevision=True, horizontalAlignment='middle'))
                     ])
 
+                tabHist.append(tab)
+                print("tabHist", tabHist)
+
+                return saveTab3
+
+            elif readyTab3 == True and tab in tabHist:
+                print(">>we are loading tab3 again")
+
+                tabHist.append(tab)
+                print("tabHist", tabHist)
+                print("tab 3 from loaded")
+
+                return saveTab3
+
             else:
-                return html.Div([
-                    html.H3('Please follow the steps')
-                ])
+                return html.Div([html.H3('Please follow the steps')])
 
     elif tab == 'tab-4':
-            if readyTab4 == True:
+            if readyTab4 == True and tab not in tabHist:
+                print(">>we are computing tab 4 first time")
 
                 # Global variables
-                global c, cloud_traces
+                global c, cloud_traces, saveTab4
 
                 # VIZUALIZE CLOUD
                 c = create_cloud(scan_pcd, downSize, 'grey')
@@ -682,7 +715,7 @@ def render_content(tab):
                 print("complete")
                 print(c.layout)
 
-                return html.Div([
+                saveTab4 = html.Div([
                     html.P("Cloud Voxel Downsampling:",
                            style={'fontFamily': 'dosis', 'fontSize': '15px', 'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 10,'height': 'auto', 'display': 'inline'}),
                     html.Div([dcc.Input(id='subValue', value='20', type='number',
@@ -700,6 +733,20 @@ def render_content(tab):
                        ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', horizontalAlignment='middle'))
 #html.Div([dbc.Button('Finish', id='ICP', color="secondary", className="mr-1",
 #                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'})]),
+
+                tabHist.append(tab)
+                print("tabHist", tabHist)
+
+                return saveTab4
+
+            elif readyTab4 == True and tab in tabHist:
+                print(">>we are loading tab4 again")
+
+                tabHist.append(tab)
+                print("tabHist", tabHist)
+
+                return saveTab4
+
             else:
                 return html.Div([
                     html.H3('Please follow the steps')
