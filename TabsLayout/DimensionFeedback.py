@@ -495,18 +495,17 @@ def render_content(tab):
         return html.Div([
                 html.Div([dcc.Upload(id='upload-data', children=html.Div([html.Button('Upload Files')]),
                                      style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 'auto', 'margin': '10px', 'display': 'inline-block'}, multiple=True)]),
+            html.Div([html.P("Are the two point clouds aligned?",
+                             style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin': '5px', 'height': 'auto',
+                                    'display': 'inline'}),
+                      dbc.Button('NO', id='button-not', color="secondary", className="mr-1",
+                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '40px', 'height': '30px',
+                                        'margin': '3px'}),
+                      dbc.Button('YES', id='button-yes', color="secondary", className="mr-1",
+                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '40px', 'height': '30px',
+                                        'margin': '3px'})
+                      ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
                 html.Div(id='upload-output'), #computing run
-
-                html.Div([html.P("Are the two point clouds aligned?",
-                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin': '5px', 'height': 'auto',
-                                        'display': 'inline'}),
-                          dbc.Button('NO', id='button-not', color="secondary", className="mr-1",
-                                     style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '40px', 'height': '30px',
-                                            'margin': '3px'}),
-                          dbc.Button('YES', id='button-yes', color="secondary", className="mr-1",
-                                     style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '40px', 'height': '30px',
-                                            'margin': '3px'})
-                          ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
                 html.Div(id='emptyBig'),
                 html.Div([
                     html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
@@ -550,24 +549,16 @@ def render_content(tab):
                                          value=180, size=400)]),
                 ], style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': '100%', 'display': 'flex', 'flexWrap': 'nowrap', 'align-items': 'center',
                           'justify-content': 'center', 'margin':'10px'}),
+                html.Div([html.Div([dbc.Button('Align', id='ICP', color="secondary", className="mr-1",
+                                               style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px',
+                                                      'margin': '3px'})]),
+                          html.P("Proceed to tab 3.Feedback when the models are aligned.",
+                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin': '5px', 'height': 'auto',
+                                        'display': 'inline'}),
+                          ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
                 html.Div([
                     html.Div(dcc.Graph(id='3d_scat', figure=fig), style={'height': '50%', 'margin': '20px', 'width':'99%'}),
                 ], style=dict(uirevision=True, horizontalAlignment='middle')),
-                html.Div([
-                    html.Div([dbc.Button('Finish', id='ICP', color="secondary", className="mr-1",
-                                          style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'})]),
-                    html.Div(
-                        [
-                            dbc.Button("Proceed to Feedback", id="open",
-                                       style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px', 'margin': '3px'}),
-                            dbc.Modal(
-                                [
-                                    dbc.ModalHeader("Proceed to Feedback"),
-                                    dbc.ModalBody("The two models are aligned and you can proceed to tab 3.Feedback"),
-                                    dbc.ModalFooter(
-                                        dbc.Button("Close", id="close", className="mr-1")
-                                    ), ], id="modal", ), ])
-                ], style={'display': 'flex', 'flexWrap': 'nowrap', 'verticalAlignment':'middle'}),
                 html.Div([
                     html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
                              style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
@@ -728,7 +719,7 @@ def render_content(tab):
                            style={'fontFamily': 'dosis', 'fontSize': '15px', 'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 10,'height': 'auto', 'display': 'inline'}),
                     html.Div([dcc.Input(id='subValue', value='20', type='number',
                                         style={'fontFamily': 'dosis', 'fontSize': '15px', 'width': 100, 'height': 30, 'marginLeft': 0, 'marginRight': 10, 'marginTop': 10, 'marginBottom': 10})]),
-                    html.Div([dbc.Button('Erase Trace', id='erase', color="secondary", className="mr-1",
+                    html.Div([dbc.Button('Erase Measurements', id='erase', color="secondary", className="mr-1",
                                           style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': 30, 'margin': 10})])
                 ], style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
                        html.Div([
@@ -1124,17 +1115,6 @@ def rotate(ICP, slider_z, slider_y, slider_x, fig, cur_id): # all the inputs fro
         return fig
     else:
         return fig
-
-#Creates Modal
-@app.callback(
-    Output("modal", "is_open"),
-    [Input("open", "n_clicks"), Input("close", "n_clicks")],
-    [State("modal", "is_open")],
-)
-def toggle_modal(n1, n2, is_open):
-    if n1 or n2:
-        return not is_open
-    return is_open
 
 #callback to change the tab with a button
 @app.callback(
