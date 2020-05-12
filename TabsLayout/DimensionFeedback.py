@@ -509,7 +509,7 @@ def render_content(tab):
                 html.Div(id='emptyBig'),
                 html.Div([
                     html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
-                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
+                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom', 'margin':'20px'})]),
         ])
 
     elif tab == 'tab-1' and len(tabHist) > 1:
@@ -534,7 +534,8 @@ def render_content(tab):
             fig.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                               scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                          yaxis=dict(title='', showbackground=False, showticklabels=False),
-                                         zaxis=dict(title='', showbackground=False, showticklabels=False)), ),
+                                         zaxis=dict(title='', showbackground=False, showticklabels=False)),
+                              height=600, width=1200, margin=dict(r=0, l=10, b=10, t=10)),
             print("tab 2 is made")
 
 
@@ -553,15 +554,15 @@ def render_content(tab):
                                                style={'fontFamily': 'dosis', 'fontSize': '15px', 'height': '30px',
                                                       'margin': '3px'})]),
                           html.P("Proceed to tab 3.Feedback when the models are aligned.",
-                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin': '5px', 'height': 'auto',
+                                 style={'fontFamily': 'dosis', 'fontSize': '15px', 'margin': '10px', 'height': 'auto',
                                         'display': 'inline'}),
                           ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
                 html.Div([
-                    html.Div(dcc.Graph(id='3d_scat', figure=fig), style={'height': '50%', 'margin': '20px', 'width':'99%'}),
+                    html.Div(dcc.Graph(id='3d_scat', figure=fig), style={'height': '99vh', 'width':'99vw'}),
                 ], style=dict(uirevision=True, horizontalAlignment='middle')),
                 html.Div([
                     html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
-                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
+                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom', 'margin':'20px'})]),
             ])
 
             tabHist.append(tab)
@@ -599,8 +600,8 @@ def render_content(tab):
                 mesh = o3d.io.read_triangle_mesh(pathMesh)
 
                 # load standard dimension cloud
-                pathDimCloud1 = p + '/amager_cloud1.xyz'  # start
-                pathDimCloud2 = p + '/amager_cloud2.xyz'  # end
+                pathDimCloud1 = p + '/cloud1.xyz'  # start
+                pathDimCloud2 = p + '/cloud2.xyz'  # end
                 d1pcd = loadCloud(pathDimCloud1, red)
                 d2pcd = loadCloud(pathDimCloud2, red)
 
@@ -629,7 +630,8 @@ def render_content(tab):
                 m.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                                 scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                            yaxis=dict(title='', showbackground=False, showticklabels=False),
-                                           zaxis=dict(title='', showbackground=False, showticklabels=False))),
+                                           zaxis=dict(title='', showbackground=False, showticklabels=False)),
+                              height=600, width=1200, margin=dict(r=0, l=10, b=10, t=10)),
 
                 saveTab3 = html.Div([
                             html.Div([html.P("Select tolerance: ",
@@ -657,11 +659,11 @@ def render_content(tab):
                                                           'fontSize': '20px'})],
                                style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')),
                            html.Div([
-                               html.Div(dcc.Graph(id='3d_mesh', figure=m), style={'height': '70%', 'margin': '5px', 'width':'99%'}),
+                               html.Div(dcc.Graph(id='3d_mesh', figure=m), style={'height': '99vh', 'width':'99vw'}),
                            ], style=dict(uirevision=True, horizontalAlignment='middle')),
                     html.Div([
                         html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
-                                 style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
+                                 style={'height': '50%', 'width': '99%', 'yanchor': 'bottom', 'margin':'20px'})]),
                     ])
 
                 tabHist.append(tab)
@@ -686,7 +688,7 @@ def render_content(tab):
                 print(">>we are computing tab 4 first time")
 
                 # Global variables
-                global c, cloud_traces, saveTab4
+                global c, cloud_traces, saveTab4, cloudCam
 
                 # VIZUALIZE CLOUD
                 c = create_cloud(scan_pcd, downSize, 'grey')
@@ -709,12 +711,29 @@ def render_content(tab):
                 c.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                                 scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                            yaxis=dict(title='', showbackground=False, showticklabels=False),
-                                           zaxis=dict(title='', showbackground=False, showticklabels=False))),
+                                           zaxis=dict(title='', showbackground=False, showticklabels=False)),
+                              height=600, width=600, margin=dict(r=0, l=10, b=10, t=10)),
+                m.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
+                                scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
+                                           yaxis=dict(title='', showbackground=False, showticklabels=False),
+                                           zaxis=dict(title='', showbackground=False, showticklabels=False)),
+                                height=600, width=600, margin=dict(r=0, l=10, b=10, t=10)),
+
+                c.update_layout(scene_camera = {'up': {'x': 0, 'y': 0, 'z': 1},
+                                                'center': {'x': 0, 'y': 0, 'z': 0},
+                                                'eye': {'x': 1.5, 'y': 1.5, 'z': 1.5},
+                                                'projection': {'type': 'perspective'}})
+
+                m.update_layout(scene_camera={'up': {'x': 0, 'y': 0, 'z': 1},
+                                              'center': {'x': 0, 'y': 0, 'z': 0},
+                                              'eye': {'x': 1.5, 'y': 1.5, 'z': 1.5},
+                                              'projection': {'type': 'perspective'}})
+
 
                 print("complete")
-                print(c.layout)
 
                 saveTab4 = html.Div([
+                    html.Div([
                     html.P("Cloud Voxel Downsampling:",
                            style={'fontFamily': 'dosis', 'fontSize': '15px', 'marginLeft': 10, 'marginRight': 10, 'marginTop': 15, 'marginBottom': 10,'height': 'auto', 'display': 'inline'}),
                     html.Div([dcc.Input(id='subValue', value='20', type='number',
@@ -725,14 +744,24 @@ def render_content(tab):
                        html.Div([
                            html.Div(id='empty3', style={'width': 20, 'height': 'auto', 'display': 'inline'}),
                            html.P("3d Scan ", style={'height': 'auto', 'display': 'inline', 'fontFamily': 'dosis',
-                                                          'fontSize': '20px'})],
+                                                          'fontSize': '20px'}),
+                           html.Div(id='empty4', style={'width': 1000, 'height': 'auto', 'display': 'inline'}),
+                           html.P("3d Model ", style={'height': 'auto', 'display': 'inline', 'fontFamily': 'dosis',
+                                                     'fontSize': '20px'})
+                       ],
                            style=dict(display='flex', flexWrap='nowrap', width=2000, verticalAlignment='middle')), \
-                       html.Div([
-                           html.Div(dcc.Graph(id='3d_scan', figure=c), style={'height': '70%', 'margin': '5px', 'width':'99%'}),
-                       ], style=dict(uirevision=True, display='flex', flexWrap='nowrap', horizontalAlignment='middle')),
+                      html.Div([
+                               html.Div(dcc.Graph(id='3d_scan', figure=c), style={'height': '100vh', 'width':'100vw'}),
+                               html.Div(dcc.Graph(id='3d_mesh_duplicate', figure=m), style={'height': '100vh', 'width':'100vw'}),
+                           ], style=dict(display='flex', flexWrap='nowrap', verticalAlignment='middle')),
+                html.Div([
+                        dcc.Store(id = 'saveCam')
+                ]),
                 html.Div([
                     html.Img(src='data:image/png;base64,{}'.format(encoded_logos.decode()),
-                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom'})]),
+                             style={'height': '50%', 'width': '99%', 'yanchor': 'bottom', 'margin': '20px'})]),
+                    ])
+
 
 
                 tabHist.append(tab)
@@ -775,7 +804,9 @@ def parse_contents(contents, filename, date):
     c.update_layout(scene_aspectmode='data', showlegend=False, uirevision=True,
                     scene=dict(xaxis=dict(title='', showbackground=False, showticklabels=False),
                                yaxis=dict(title='', showbackground=False, showticklabels=False),
-                               zaxis=dict(title='', showbackground=False, showticklabels=False))),
+                               zaxis=dict(title='', showbackground=False, showticklabels=False)),
+                    height=600, width=1200, margin=dict(r=0, l=10, b=10, t=10))
+
 
     # run icp and add the scan as a trace
     #scan_pcd = ransac_icp(scan_pcd, pcd)
@@ -785,7 +816,7 @@ def parse_contents(contents, filename, date):
     readyTab3 = True
     readyTab4 = True
 
-    return html.Div(dcc.Graph(id='DemoView', figure= c), style={'height': '70%', 'width':'99%'})
+    return html.Div(dcc.Graph(id='DemoView', figure= c), style={'height': '99vh', 'width':'99vw', 'horizontal-align':'middle'})
 
 
 #Runs Ransac ICP when the file is uploaded
@@ -850,19 +881,21 @@ def redrawMeshDim(toleranceSelect, m, cldStartPtArray, cldPEndPtArray, mtraces_n
 
 
 #This changes the voxel subsampling, and the manual dimensions
-@app.callback(Output('3d_scan', 'figure'),
+@app.callback([Output('3d_scan', 'figure'),
+            Output('3d_mesh_duplicate', 'figure')],
             [Input('subValue', 'value'),
              Input('3d_scan', 'clickData'),
-             Input('erase', 'n_clicks')])
-def changeCloudPlot(subValue,clickData, n_clicks):
-    return redrawCloud(subValue,clickData, n_clicks,c ,cloud_traces, resultsX,resultsY,resultsZ)
+             Input('erase', 'n_clicks'),
+             Input ('3d_scan', 'relayoutData')])
+def changeCloudPlot(subValue,clickData, n_clicks, relayoutData):
+    return redrawCloud(subValue,clickData, n_clicks, relayoutData, c, m ,cloud_traces, resultsX,resultsY,resultsZ)
 
-def redrawCloud(subValue,clickData, n_clicks, c,cloud_traces, resultsX,resultsY,resultsZ):
+def redrawCloud(subValue,clickData, n_clicks, relayoutData, c, m ,cloud_traces, resultsX,resultsY,resultsZ):
     ctx = dash.callback_context
 
     if not ctx.triggered:
-        nothingYet = 'no id yet'
-        return c
+        print("redrawCloudNotTriggered")
+        return c, m
 
     else:
         ids = ctx.triggered
@@ -883,70 +916,81 @@ def redrawCloud(subValue,clickData, n_clicks, c,cloud_traces, resultsX,resultsY,
                 return c
         #AddManual Dim
         elif name == '3d_scan':
-            print(clickData)
 
-            startX = []
-            endX = []
-            startY = []
-            endY = []
-            startZ = []
-            endZ = []
+            if not clickData is None:
+                print(clickData)
 
-            for p in clickData['points']:
-                resultsX.append(clickData['points'][0]['x'])
-                resultsY.append(clickData['points'][0]['y'])
-                resultsZ.append(clickData['points'][0]['z'])
+                startX = []
+                endX = []
+                startY = []
+                endY = []
+                startZ = []
+                endZ = []
 
-            print("resultsX", len(resultsX))
+                for p in clickData['points']:
+                    resultsX.append(clickData['points'][0]['x'])
+                    resultsY.append(clickData['points'][0]['y'])
+                    resultsZ.append(clickData['points'][0]['z'])
 
-            for i in range(len(resultsX)):
-                if i % 2 == 0:
-                    startX.append(resultsX[i])
-                    startY.append(resultsY[i])
-                    startZ.append(resultsZ[i])
-                else:
-                    endX.append(resultsX[i])
-                    endY.append(resultsY[i])
-                    endZ.append(resultsZ[i])
+                print("resultsX", len(resultsX))
 
-            if len(startX) == len(endX):
-                print("yes")
-
-                arrStartX = np.asarray(startX)
-                arrEndX = np.asarray(endX)
-                arrStartY = np.asarray(startY)
-                arrEndY = np.asarray(endY)
-                arrStartZ = np.asarray(startZ)
-                arrEndZ = np.asarray(endZ)
-
-                array1 = np.array([arrStartX, arrStartY, arrStartZ])
-                array2 = np.array([arrEndX, arrEndY, arrEndZ])
-
-                c.add_trace(create_CallbackdimText(array1, array2))
-                c.add_trace(go.Scatter3d(mode='markers',x=resultsX,y=resultsY,z=resultsZ, marker=dict(color='red',size=5),showlegend=False))
-
-                lines = []
-                for i in range(len(resultsX) - 1):
-                    xlinePt = np.array([resultsX[i], resultsX[i + 1]])
-                    ylinePt = np.array([resultsY[i], resultsY[i + 1]])
-                    zlinePt = np.array([resultsZ[i], resultsZ[i + 1]])
-
-                    # Show every second line
+                for i in range(len(resultsX)):
                     if i % 2 == 0:
-                        lines.append(
-                            go.Scatter3d(x=xlinePt, y=ylinePt, z=zlinePt, mode="lines", marker=dict(color='red', size=6)))
+                        startX.append(resultsX[i])
+                        startY.append(resultsY[i])
+                        startZ.append(resultsZ[i])
+                    else:
+                        endX.append(resultsX[i])
+                        endY.append(resultsY[i])
+                        endZ.append(resultsZ[i])
 
-                for item in lines:
-                    c.add_trace(item)
+                if len(startX) == len(endX):
+                    print("yes")
 
-                return c
+                    arrStartX = np.asarray(startX)
+                    arrEndX = np.asarray(endX)
+                    arrStartY = np.asarray(startY)
+                    arrEndY = np.asarray(endY)
+                    arrStartZ = np.asarray(startZ)
+                    arrEndZ = np.asarray(endZ)
+
+                    array1 = np.array([arrStartX, arrStartY, arrStartZ])
+                    array2 = np.array([arrEndX, arrEndY, arrEndZ])
+
+                    c.add_trace(create_CallbackdimText(array1, array2))
+                    c.add_trace(go.Scatter3d(mode='markers',x=resultsX,y=resultsY,z=resultsZ, marker=dict(color='red',size=5),showlegend=False))
+
+                    lines = []
+                    for i in range(len(resultsX) - 1):
+                        xlinePt = np.array([resultsX[i], resultsX[i + 1]])
+                        ylinePt = np.array([resultsY[i], resultsY[i + 1]])
+                        zlinePt = np.array([resultsZ[i], resultsZ[i + 1]])
+
+                        # Show every second line
+                        if i % 2 == 0:
+                            lines.append(
+                                go.Scatter3d(x=xlinePt, y=ylinePt, z=zlinePt, mode="lines", marker=dict(color='red', size=6)))
+
+                    for item in lines:
+                        c.add_trace(item)
+
+                    return c, m
+
+                else:
+                    print("no")
+                    c.add_trace(go.Scatter3d(mode='markers', x=resultsX, y=resultsY, z=resultsZ, marker=dict(color='red', size=5), showlegend=False))
+
+                    print(c)
+                    return c, m
+
+
+            if not relayoutData is None and 'scene.camera' in relayoutData:
+                print(relayoutData)
+                m.update_layout(scene_camera=relayoutData['scene.camera'])
+                return c, m
 
             else:
-                print("no")
-                c.add_trace(go.Scatter3d(mode='markers', x=resultsX, y=resultsY, z=resultsZ, marker=dict(color='red', size=5), showlegend=False))
-
-                print(c)
-                return c
+                return c,m
 
         elif name == 'erase':
             resultsX.clear()
@@ -960,9 +1004,9 @@ def redrawCloud(subValue,clickData, n_clicks, c,cloud_traces, resultsX,resultsY,
             for item in cloud_traces:
                 c.add_trace(item)
 
-            return c
+            return c, m
         else:
-            return c
+            return c, m
 
 #This rotates the cloud in tab2
 @app.callback(Output('3d_scat', 'figure'),
@@ -1142,7 +1186,6 @@ def redrawGraph(tab):
     if len(tabHist) > 1 and tab == 'tab-1':
         print("loading saved graph")
         return saveTab1
-
 
 
 if __name__ == '__main__':
