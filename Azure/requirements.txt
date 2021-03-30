@@ -61,7 +61,7 @@ PyAutoGUI==0.9.48
 pybind11==2.5.0
 pye57==0.2.3
 PyGetWindow==0.0.8
-Pygments==2.5.2
+Pygments==2.7.4
 PyMsgBox==1.0.7
 pyparsing==2.4.7
 pyperclip==1.7.0
